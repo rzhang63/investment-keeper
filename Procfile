@@ -1,1 +1,1 @@
-web: sh setup.sh && streamlit run investment-keeper.py
+web: sh setup.sh && streamlit run app.py

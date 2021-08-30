@@ -103,7 +103,7 @@ def main():
         assets_df = pd.read_excel(current_asset_file, skiprows=[0, 1, 2])[['基金代码','资产小计','单位净值日期']]
         assets_df.to_sql('alipay_asset_'+st.session_state['user'], con=engine, if_exists='replace') # save data to mysql
 
-        display_all_funds(transactions_df,assets_df) 
+        #display_all_funds(transactions_df,assets_df) 
     elif current_asset_file is not None: # 资产证明上传了，但是交易明细没上传
         # get existing tables in db
         ins = inspect(engine)

@@ -2,7 +2,7 @@ numpy==1.21.2
 streamlit==0.87.0
 pandas==1.3.2
 openpyxl==3.0.7
-mysql-connector-python==x.x.x
+mysql-connector-python==8.0.26
 SQLAlchemy==1.4.23
 PyMySQL==1.0.2
 scipy==1.7.1

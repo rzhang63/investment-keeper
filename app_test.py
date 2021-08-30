@@ -20,8 +20,8 @@ schema = [
     bigquery.SchemaField("password", "INTEGER", mode="REQUIRED"),
 ]
 
-#table = bigquery.Table('investment-keeper.userstable', schema=schema)
-#table = client.create_table(table)  # Make an API request.
+table = bigquery.Table('pure-fold-324517.investment_keeper.userstable', schema=schema)
+table = client.create_table(table)  # Make an API request.
 
 
 # Perform query.

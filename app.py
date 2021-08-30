@@ -1,10 +1,13 @@
 import hashlib
-import sqlite3
-import overview_page
 
-import pandas as pd
-import streamlit as st
 import mysql.connector
+import streamlit as st
+
+import huabao_page
+import overview_page
+import alipay_page
+
+st.set_page_config(layout="wide")
 
 
 def make_hashes(password):
@@ -19,11 +22,13 @@ def check_hashes(password, hashed_text):
 
 # Initialize connection.
 # Uses st.cache to only run once.
-@st.cache(allow_output_mutation=True, hash_funcs={"_thread.RLock": lambda _: None})
+#@st.cache(allow_output_mutation=True, hash_funcs={"_thread.RLock": lambda _: None})
 def init_connection():
     return mysql.connector.connect(**st.secrets["mysql"])
 
 conn = init_connection()
+
+
 
 # Perform query.
 # Uses st.cache to only rerun when the query changes or after 10 min.
@@ -52,6 +57,12 @@ def login_user(username, password):
 
 def view_all_users():
     return run_query('SELECT * FROM userstable')
+
+def signout():
+    # Delete all the items in Session state
+    for key in st.session_state.keys():
+        del st.session_state[key]
+    st.experimental_rerun()
 
 
 def main():
@@ -97,7 +108,9 @@ def main():
                     st.info("Go to Login Menu to login")
     else:
         PAGES = {
-            "总览": overview_page,
+            "总览": overview_page
+            ,"华宝": huabao_page
+            ,"支付宝": alipay_page
         }
 
         # user interaction
@@ -106,9 +119,7 @@ def main():
         page = PAGES[selection]
         page.main()
 
-        if st.sidebar.button('Sign out'):
-            st.session_state['login'] = 0
-            st.experimental_rerun()
+        st.sidebar.button('Sign out',on_click=signout)
 
 
 

@@ -4,18 +4,25 @@ import streamlit as st
 from google.oauth2 import service_account
 from google.cloud import bigquery
 
-hide_menu_style = """
-        <style>
-        #MainMenu {visibility: hidden;}
-        </style>
-        """
-st.markdown(hide_menu_style, unsafe_allow_html=True)
+
 
 # Create API client.
 credentials = service_account.Credentials.from_service_account_info(
     st.secrets["gcp_service_account"]
 )
 client = bigquery.Client(credentials=credentials)
+
+st.write(client.project)
+
+
+schema = [
+    bigquery.SchemaField("username", "STRING", mode="REQUIRED"),
+    bigquery.SchemaField("password", "INTEGER", mode="REQUIRED"),
+]
+
+#table = bigquery.Table('investment-keeper.userstable', schema=schema)
+#table = client.create_table(table)  # Make an API request.
+
 
 # Perform query.
 # Uses st.cache to only rerun when the query changes or after 10 min.

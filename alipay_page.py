@@ -130,8 +130,7 @@ def display_all_funds(transactions_df,assets_df):
         #    st.session_state[fund_name+'_xirr'] = None
         column1, column2= st.columns(2)
         with column1:
-            st.write(code2name[fund_code])
-            st.write(fund_code)
+            st.write('{} ({})'.format(code2name[fund_code],fund_code))
         with column2:
             if fund_code in unique_fund_code2:
                 asset_date = assets_df[assets_df['CODE']==fund_code]['DATE'].values.item()
@@ -151,7 +150,9 @@ def display_all_funds(transactions_df,assets_df):
             data = [(datetime.datetime.strptime(x[0], '%Y-%m-%d %H:%M:%S'),x[1]) for x in data]
 
             xirr = utils.xirr(data)
+            st.write('市值: {}% ({})'.format(asset_value,asset_date))
             st.write('XIRR: {}% ({})'.format(round(xirr*100,2),asset_date))
+
 
             #st.write(data)
 

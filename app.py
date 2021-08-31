@@ -124,16 +124,6 @@ def main():
 
 
 
-# st.write(os.getcwd())
-#
-#uploaded_file = st.file_uploader("Choose a file")
-#
-# if uploaded_file is not None:
-#    #dataframe = pd.read_csv(uploaded_file,skiprows=[0,1,2,3],encoding='gbk')
-#    dataframe = pd.read_excel(uploaded_file)
-#    st.write(dataframe)
-#    #with open(os.path.join("tempDir",image_file.name),"wb") as f:
-#    #    f.write(image_file.getbuffer())
-#    #st.success("Saved File")
+
 if __name__ == '__main__':
     main()

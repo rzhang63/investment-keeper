@@ -121,6 +121,8 @@ def main():
         page.main()
 
         st.sidebar.button('Sign out',on_click=signout)
+    
+    st.sidebar.markdown('<h5>Created by Ruotao Zhang</h5>', unsafe_allow_html=True)
 
 
 

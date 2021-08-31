@@ -95,7 +95,7 @@ def load_and_save_asset_file(file):
     assets_df.columns = ['CODE','ASSET','DATE']
     st.write(assets_df)
     st.write(assets_df.dtypes)
-    assets_df = assets_df.astype({'DATE': 'str','ASSET':'float'})
+    #assets_df = assets_df.astype({'DATE': 'str','ASSET':'float'})
     assets_df['CODE'] = [str(int(c)) if len(str(int(c)))==6 else '0'*(6-len(str(int(c))))+str(int(c)) for c in assets_df['CODE'].tolist()]
 
     dropcreate_alipay_asset()

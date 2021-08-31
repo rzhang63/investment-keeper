@@ -108,10 +108,10 @@ def display_all_funds(transactions_df,assets_df):
 
     unique_fund_code1 = set(transactions_df['CODE'])
     unique_fund_code2 = set(assets_df['CODE'])
-    st.write(unique_fund_code1)
-    st.write(unique_fund_code2)
-    st.write(unique_fund_code1.difference(unique_fund_code2))
-    st.write(unique_fund_code2.difference(unique_fund_code1))
+    #st.write(unique_fund_code1)
+    #st.write(unique_fund_code2)
+    #st.write(unique_fund_code1.difference(unique_fund_code2))
+    #st.write(unique_fund_code2.difference(unique_fund_code1))
     assert unique_fund_code2.issubset(unique_fund_code1)
 
     output = []
@@ -207,7 +207,7 @@ def main():
         if asset_table_name in table_list and transaction_table_name in table_list:
             assets_df = load_snowflake_to_pandas(asset_table_name)
             transactions_df = load_snowflake_to_pandas(transaction_table_name)
-            st.write(transactions_df)
+            #st.write(transactions_df)
             display_all_funds(transactions_df,assets_df)
         elif asset_table_name in table_list:
             st.write('请上传历史交易明细')

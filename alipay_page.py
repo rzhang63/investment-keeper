@@ -1,13 +1,9 @@
 import streamlit as st
 import pandas as pd
-from sqlalchemy import create_engine,inspect
-from sqlalchemy.dialects.mysql import insert
-import numpy
 
 import datetime
 import utils
 import snowflake.connector
-from snowflake.connector.pandas_tools import pd_writer
 from snowflake.connector.pandas_tools import write_pandas
 
 
@@ -132,11 +128,11 @@ def display_all_funds(transactions_df,assets_df):
         data = [(datetime.datetime.strptime(x[0], '%Y-%m-%d %H:%M:%S'),x[1]) for x in data]
 
         xirr = utils.xirr(data)
-        output.append((asset_date,asset_value,xirr))
+        output.append((fund_code,asset_date,asset_value,xirr))
 
-    sorted_output = sorted(output,key=lambda x:x[1],reverse=True)
+    sorted_output = sorted(output,key=lambda x:x[2],reverse=True)
     for o in sorted_output:
-        asset_date,asset_value,xirr = o[0],o[1],o[2]
+        fund_code,asset_date,asset_value,xirr = o[0],o[1],o[2],o[3]
         column1, column2= st.columns(2)
         with column1:
             st.write('{} ({})'.format(code2name[fund_code],fund_code))
@@ -153,7 +149,7 @@ def main():
     current_asset_file = st.file_uploader("上传最新资产证明", type=['xlsx'])
 
     # create table fundXIRR if not exists
-    create_fundXIRR()
+    #create_fundXIRR()
 
     # define table names
     asset_table_name = 'ALIPAY_ASSET_'+st.session_state['user'].upper()
@@ -201,7 +197,7 @@ def main():
     else: # 都没上传
         # get existing tables in db
         table_list = get_table_list()
-        st.write(table_list)
+        #st.write(table_list)
 
         # 检查数据库里是否有资产证明
         if asset_table_name in table_list and transaction_table_name in table_list:

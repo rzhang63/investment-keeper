@@ -2,6 +2,7 @@ import scipy.optimize
 import requests
 import execjs
 import difflib
+import json
 
 
 def xnpv(valuesPerDate, rate):
@@ -42,7 +43,7 @@ def xirr(valuesPerDate):
         return None
 
 
-def getAllFundCode():
+def downloadAllFundCode():
     url = 'http://fund.eastmoney.com/js/fundcode_search.js'
     content = requests.get(url)
     jsContent = execjs.compile(content.text)
@@ -52,6 +53,17 @@ def getAllFundCode():
     for x in rawData:
         code2name[x[0]] = x[2]
         name2code[x[2]] = x[0]
+    
+    with open("./name2code.json", "w") as outfile:
+        json.dump(name2code, outfile)
+    with open("./code2name.json", "w") as outfile:
+        json.dump(code2name, outfile)
+
+def getAllFundCode():
+    with open('./name2code.json') as json_file:
+        name2code = json.load(json_file)
+    with open('./code2name.json') as json_file:
+        code2name = json.load(json_file)
     return name2code,code2name
 
 def get_closest_fund_code(s,name2code):

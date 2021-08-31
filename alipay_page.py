@@ -89,11 +89,11 @@ def load_and_save_transaction_file(file):
 
 def load_and_save_asset_file(file):
     # read in asset values
-    assets_df = tabula.read_pdf(file,pages=2)[1].iloc[1: , :][['基金代码','资产小计','单位净值日期']]
-    #st.write(df[1].iloc[1: , :])
+    assets_df = tabula.read_pdf(file,pages='all')#[1].iloc[1: , :][['基金代码','资产小计','单位净值日期']]
+    st.write(assets_df)
     #assets_df = pd.read_excel(file, skiprows=[0, 1, 2])[['基金代码','资产小计','单位净值日期']]
     assets_df.columns = ['CODE','ASSET','DATE']
-    st.write(assets_df)
+    #st.write(assets_df)
     #st.write(assets_df.dtypes)
     assets_df = assets_df.astype({'DATE': 'str','ASSET':'float'})
     assets_df['CODE'] = [str(int(c)) if len(str(int(c)))==6 else '0'*(6-len(str(int(c))))+str(int(c)) for c in assets_df['CODE'].tolist()]

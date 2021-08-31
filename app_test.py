@@ -19,7 +19,12 @@ def run_query(query):
         cur.execute(query)
         return cur.fetchall()
 
+def create_usertable():
+    run_query('CREATE TABLE IF NOT EXISTS userstable(username VARCHAR(255) PRIMARY KEY,password VARCHAR(255))')
+
 rows = run_query("SELECT * from mytable;")
+
+create_usertable()
 
 # Print results.
 for row in rows:

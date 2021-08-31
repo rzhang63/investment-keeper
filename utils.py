@@ -1,6 +1,7 @@
 import scipy.optimize
 import requests
 import execjs
+import difflib
 
 
 def xnpv(valuesPerDate, rate):
@@ -52,3 +53,8 @@ def getAllFundCode():
         code2name[x[0]] = x[2]
         name2code[x[2]] = x[0]
     return name2code,code2name
+
+def get_closest_fund_code(s,name2code):
+    matched_name = max([(k,difflib.SequenceMatcher(a=k, b=s).ratio()) for k in name2code.keys()],key=lambda x:x[1])[0]
+    return name2code[matched_name]+matched_name
+        

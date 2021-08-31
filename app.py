@@ -6,6 +6,7 @@ import streamlit as st
 import huabao_page
 import overview_page
 import alipay_page
+import snowflake.connector
 
 st.set_page_config(layout="wide")
 
@@ -24,7 +25,7 @@ def check_hashes(password, hashed_text):
 # Uses st.cache to only run once.
 #@st.cache(allow_output_mutation=True, hash_funcs={"_thread.RLock": lambda _: None})
 def init_connection():
-    return mysql.connector.connect(**st.secrets["mysql"])
+    return snowflake.connector.connect(**st.secrets["snowflake"])
 
 conn = init_connection()
 

@@ -108,6 +108,8 @@ def display_all_funds(transactions_df,assets_df):
 
     unique_fund_code1 = set(transactions_df['CODE'])
     unique_fund_code2 = set(assets_df['CODE'])
+    st.write(unique_fund_code1)
+    st.write(unique_fund_code2)
     st.write(unique_fund_code1.difference(unique_fund_code2))
     st.write(unique_fund_code2.difference(unique_fund_code1))
     assert unique_fund_code2.issubset(unique_fund_code1)

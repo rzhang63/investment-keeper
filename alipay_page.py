@@ -90,7 +90,7 @@ def load_and_save_transaction_file(file):
 def load_and_save_asset_file(file):
     # read in asset values
     df = tabula.read_pdf(file,pages=2)
-    st.write(df[1])
+    st.write(df[1].iloc[1: , :])
     assets_df = pd.read_excel(file, skiprows=[0, 1, 2])[['基金代码','资产小计','单位净值日期']]
     assets_df.columns = ['CODE','ASSET','DATE']
     assets_df = assets_df.astype({'DATE': 'str'})

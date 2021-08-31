@@ -146,7 +146,7 @@ def display_all_funds(transactions_df,assets_df):
         with column1:
             st.write('{} ({})'.format(code2name[fund_code],fund_code))
         with column2:
-            st.write('日期: {},   市值: {},   XIRR: {}%'.format(asset_date,asset_value,round(xirr*100,2)))
+            st.write('日期: {}, 市值: {}, XIRR: {}%'.format(asset_date,asset_value,round(xirr*100,2)))
     
     
 

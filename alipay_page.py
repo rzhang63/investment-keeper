@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import tabula
 
 import datetime
 import utils
@@ -88,6 +89,8 @@ def load_and_save_transaction_file(file):
 
 def load_and_save_asset_file(file):
     # read in asset values
+    df = tabula.read_pdf(file,pages=2)
+    st.write(df)
     assets_df = pd.read_excel(file, skiprows=[0, 1, 2])[['基金代码','资产小计','单位净值日期']]
     assets_df.columns = ['CODE','ASSET','DATE']
     assets_df = assets_df.astype({'DATE': 'str'})
@@ -150,7 +153,7 @@ def main():
     
     # upload files
     transaction_file = st.file_uploader("上传历史交易明细", type=['csv'])
-    current_asset_file = st.file_uploader("上传最新资产证明", type=['xlsx'])
+    current_asset_file = st.file_uploader("上传最新资产证明", type=['pdf'])
 
     # create table fundXIRR if not exists
     #create_fundXIRR()

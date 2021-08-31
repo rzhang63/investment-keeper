@@ -150,8 +150,7 @@ def display_all_funds(transactions_df,assets_df):
             data = [(datetime.datetime.strptime(x[0], '%Y-%m-%d %H:%M:%S'),x[1]) for x in data]
 
             xirr = utils.xirr(data)
-            st.write('市值: {}% ({})'.format(asset_value,asset_date))
-            st.write('XIRR: {}% ({})'.format(round(xirr*100,2),asset_date))
+            st.write('日期: {}, 市值: {}, XIRR: {}%'.format(asset_date,asset_value,round(xirr*100,2)))
 
 
             #st.write(data)

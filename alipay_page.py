@@ -78,7 +78,6 @@ def load_and_save_transaction_file(file):
     OriginalName2MatchedCode = {}
     for n in unique_fund_names:
         OriginalName2MatchedCode[n] = utils.get_closest_fund_code(n,name2code)
-    st.write(OriginalName2MatchedCode)
 
     transactions_df['CODE'] = transactions_df.apply(lambda row: OriginalName2MatchedCode[row['NAME']][:6], axis=1)
     
@@ -89,7 +88,7 @@ def load_and_save_transaction_file(file):
         df=transactions_df,
         table_name='ALIPAY_TRANSACTIONS_'+st.session_state['user'].upper()
     )
-    return transactions_df
+    return transactions_df,OriginalName2MatchedCode
 
 def load_and_save_asset_file(file):
     # read in asset values
@@ -196,10 +195,11 @@ def main():
     # 检查是否上传了历史交易明细
     if transaction_file is not None and current_asset_file is not None: # 都上传了
         # read in uploaded files
-        transactions_df = load_and_save_transaction_file(transaction_file)
+        transactions_df,OriginalName2MatchedCode = load_and_save_transaction_file(transaction_file)
         assets_df = load_and_save_asset_file(current_asset_file)
 
         display_all_funds(transactions_df,assets_df) 
+        st.write(OriginalName2MatchedCode)
     elif current_asset_file is not None: # 资产证明上传了，但是交易明细没上传
         # get existing tables in db
         table_list = get_table_list()
@@ -214,7 +214,7 @@ def main():
             # load transactions from db
             transactions_df = load_snowflake_to_pandas(transaction_table_name)
             
-            #display_all_funds(transactions_df,assets_df)
+            display_all_funds(transactions_df,assets_df)
     elif transaction_file is not None: # 资产证明没上传，但是交易明细上传了
         # get existing tables in db
         table_list = get_table_list()
@@ -224,12 +224,13 @@ def main():
             st.write('请上传最新资产证明')
         else:
             # read in transaction details from uploaded file
-            transactions_df = load_and_save_transaction_file(transaction_file)
+            transactions_df,OriginalName2MatchedCode = load_and_save_transaction_file(transaction_file)
 
             # load asset values from db
             assets_df = load_snowflake_to_pandas(asset_table_name)
 
-            #display_all_funds(transactions_df,assets_df)
+            display_all_funds(transactions_df,assets_df)
+            st.write(OriginalName2MatchedCode)
     else: # 都没上传
         # get existing tables in db
         table_list = get_table_list()
@@ -239,7 +240,7 @@ def main():
         if asset_table_name in table_list and transaction_table_name in table_list:
             assets_df = load_snowflake_to_pandas(asset_table_name)
             transactions_df = load_snowflake_to_pandas(transaction_table_name)
-            #display_all_funds(transactions_df,assets_df)
+            display_all_funds(transactions_df,assets_df)
         elif asset_table_name in table_list:
             st.write('请上传历史交易明细')
         elif transaction_table_name in table_list:

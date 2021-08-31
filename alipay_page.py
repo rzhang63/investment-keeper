@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from sqlalchemy import create_engine,inspect
 from sqlalchemy.dialects.mysql import insert
-import difflib
+import numpy
 
 import datetime
 import utils
@@ -112,69 +112,36 @@ def display_all_funds(transactions_df,assets_df):
 
     unique_fund_code1 = set(transactions_df['CODE'])
     unique_fund_code2 = set(assets_df['CODE'])
-    #st.write(unique_fund_code1)
-    #st.write(unique_fund_code2)
-    #st.write(unique_fund_names1.difference(unique_fund_names2))
-    #st.write(unique_fund_names2.difference(unique_fund_names1))
     assert unique_fund_code2.issubset(unique_fund_code1)
 
-    #unique_fund_names1 = set([code2name[c] for c in unique_fund_code1])
-    #st.write(unique_fund_names1)
-    
-    # load xirr table from db
-    #xirr_df = pd.read_sql('select * from fundXIRR_{}'.format(st.session_state['user']), con=engine)
-    #st.write(xirr_df)
-
+    output = []
     for fund_code in unique_fund_code1:
-        #if fund_name+'_xirr' not in st.session_state:
-        #    st.session_state[fund_name+'_xirr'] = None
+        if fund_code in unique_fund_code2:
+            asset_date = assets_df[assets_df['CODE']==fund_code]['DATE'].values.item()
+            asset_value = assets_df[assets_df['CODE']==fund_code]['ASSET'].values.item()
+        else:
+            asset_date = str(datetime.date.today())
+            asset_value = 0
+
+        df = transactions_df[transactions_df['CODE'] == fund_code]
+        status_list = [1 if '收入' in s.strip() else -1 for s in df['STATUS']]
+        amount_list = [x[0]*x[1] for x in list(zip(df['AMOUNT'].tolist(),status_list))]
+
+        data = list(zip(df['CREATE_TIME'].tolist(), amount_list))
+        data = [(x[0].strip(),x[1]) for x in data if x[0]<=asset_date+' 23:59:59'] + [(asset_date+' 23:59:59',asset_value)]
+        data = [(datetime.datetime.strptime(x[0], '%Y-%m-%d %H:%M:%S'),x[1]) for x in data]
+
+        xirr = utils.xirr(data)
+        output.append((asset_date,asset_value,xirr))
+
+    sorted_output = sorted(output,key=lambda x:x[1],reverse=True)
+    for o in sorted_output:
+        asset_date,asset_value,xirr = o[0],o[1],o[2]
         column1, column2= st.columns(2)
         with column1:
             st.write('{} ({})'.format(code2name[fund_code],fund_code))
         with column2:
-            if fund_code in unique_fund_code2:
-                asset_date = assets_df[assets_df['CODE']==fund_code]['DATE'].values.item()
-                asset_value = assets_df[assets_df['CODE']==fund_code]['ASSET'].values.item()
-            else:
-                asset_date = str(datetime.date.today())
-                asset_value = 0
-
-            df = transactions_df[transactions_df['CODE'] == fund_code]
-            #st.write(df)
-            #date_list = [datetime.datetime.strptime(i.strip(), '%Y-%m-%d %H:%M:%S') for i in df['交易创建时间']]
-            status_list = [1 if '收入' in s.strip() else -1 for s in df['STATUS']]
-            amount_list = [x[0]*x[1] for x in list(zip(df['AMOUNT'].tolist(),status_list))]
-
-            data = list(zip(df['CREATE_TIME'].tolist(), amount_list))
-            data = [(x[0].strip(),x[1]) for x in data if x[0]<=asset_date+' 23:59:59'] + [(asset_date+' 23:59:59',asset_value)]
-            data = [(datetime.datetime.strptime(x[0], '%Y-%m-%d %H:%M:%S'),x[1]) for x in data]
-
-            xirr = utils.xirr(data)
             st.write('日期: {}, 市值: {}, XIRR: {}%'.format(asset_date,asset_value,round(xirr*100,2)))
-
-
-            #st.write(data)
-
-            #+ [(datetime.datetime.now(),current_value)]
-            #
-            #st.session_state[fund_name+'_xirr'] = xirr
-            #upsert_fundXIRR(fund_name,xirr)
-            #
-            
-            
-            #else:
-            #    if st.session_state[fund_name+'_xirr']:
-            #        st.write('XIRR: {}% ({})'.format(round(st.session_state[fund_name+'_xirr']*100,2),datetime.date.today()))
-            #    else:
-            #        if fund_name in set(xirr_df['fund']):
-            #            latest_date = xirr_df[xirr_df['fund']==fund_name]['date'].values.item()
-            #            latest_xirr = xirr_df[(xirr_df['fund']==fund_name) & (xirr_df['date']==latest_date)]['xirr'].values.item()
-            #            st.write('XIRR: {}% ({})'.format(round(latest_xirr*100,2),latest_date))
-            #        else:
-            #            st.write('XIRR: ')
-            #st.write(st.session_state[fund_name+'_xirr'])
-    
-    #st.write(pd.DataFrame(xirr_dict))
     
     
 

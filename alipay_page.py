@@ -7,6 +7,7 @@ import tabula
 from snowflake.connector.pandas_tools import write_pandas
 
 import utils
+import pyxirr
 
 
 def init_connection():
@@ -127,7 +128,7 @@ def display_all_funds(transactions_df,assets_df):
         data = [(x[0].strip(),x[1]) for x in data if x[0]<=asset_date+' 23:59:59'] + [(asset_date+' 23:59:59',asset_value)]
         data = [(datetime.datetime.strptime(x[0], '%Y-%m-%d %H:%M:%S'),x[1]) for x in data]
 
-        xirr = utils.xirr(data)
+        xirr = pyxirr.xirr(data)
         output.append((fund_code,asset_date,asset_value,xirr))
 
     sorted_output = sorted(output,key=lambda x:x[2],reverse=True)

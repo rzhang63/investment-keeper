@@ -10,3 +10,4 @@ PyExecJS==1.5.1
 google-cloud-bigquery==2.25.1 
 snowflake-connector-python==2.6.0
 tabula-py==2.3.0
+akshare==1.0.84

@@ -5,6 +5,17 @@ import difflib
 import json
 
 
+def get_table_list(conn):
+    with conn.cursor() as cur:
+        table_list = [entry[1] for entry in cur.execute('show tables').fetchall()]
+    return table_list
+
+def load_snowflake_to_pandas(table_name,conn):
+    with conn.cursor() as cur:
+        cur.execute('select * from {}'.format(table_name))
+        df = cur.fetch_pandas_all()
+    return df
+
 def xnpv(valuesPerDate, rate):
     DAYS_PER_YEAR = 365.0
     assert isinstance(valuesPerDate, list)

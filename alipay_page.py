@@ -1,23 +1,18 @@
-import streamlit as st
-import pandas as pd
-import tabula
-
 import datetime
-import utils
+
+import pandas as pd
 import snowflake.connector
+import streamlit as st
+import tabula
 from snowflake.connector.pandas_tools import write_pandas
+
+import utils
 
 
 def init_connection():
-    return snowflake.connector.connect(**st.secrets["snowflake"])
+    return snowflake.connector.connect(**st.secrets["snowflake"],client_session_keep_alive=True)
 
 conn = init_connection()
-
-def get_table_list():
-    with conn.cursor() as cur:
-        table_list = [entry[1] for entry in cur.execute('show tables').fetchall()]
-    return table_list
-
 
 
 # create fundXIRR table
@@ -50,11 +45,7 @@ def upsert_fundXIRR(fund_name,xirr):
         cur.execute('INSERT INTO fundXIRR_{} (date, fund, xirr) VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE date=%s,fund=%s,xirr = %s'.format(st.session_state['user']),(str(datetime.date.today()),fund_name,xirr,str(datetime.date.today()),fund_name,xirr))
 
 
-def load_snowflake_to_pandas(table_name):
-    with conn.cursor() as cur:
-        cur.execute('select * from {}'.format(table_name))
-        df = cur.fetch_pandas_all()
-    return df
+
 
 
 def load_and_save_transaction_file(file):
@@ -174,7 +165,7 @@ def main():
         st.write(OriginalName2MatchedCode)
     elif current_asset_file is not None: # 资产证明上传了，但是交易明细没上传
         # get existing tables in db
-        table_list = get_table_list()
+        table_list = utils.get_table_list(conn)
 
         # 检查数据库里是否有历史交易明细
         if transaction_table_name not in table_list:
@@ -184,12 +175,12 @@ def main():
             assets_df = load_and_save_asset_file(current_asset_file)
 
             # load transactions from db
-            transactions_df = load_snowflake_to_pandas(transaction_table_name)
+            transactions_df = utils.load_snowflake_to_pandas(transaction_table_name,conn)
             
             display_all_funds(transactions_df,assets_df)
     elif transaction_file is not None: # 资产证明没上传，但是交易明细上传了
         # get existing tables in db
-        table_list = get_table_list()
+        table_list = utils.get_table_list(conn)
 
         # 检查数据库里是否有资产证明
         if 'alipay_asset_'+st.session_state['user'] not in table_list:
@@ -199,19 +190,19 @@ def main():
             transactions_df,OriginalName2MatchedCode = load_and_save_transaction_file(transaction_file)
 
             # load asset values from db
-            assets_df = load_snowflake_to_pandas(asset_table_name)
+            assets_df = utils.load_snowflake_to_pandas(asset_table_name,conn)
 
             display_all_funds(transactions_df,assets_df)
             st.write(OriginalName2MatchedCode)
     else: # 都没上传
         # get existing tables in db
-        table_list = get_table_list()
+        table_list = utils.get_table_list(conn)
         #st.write(table_list)
 
         # 检查数据库里是否有资产证明
         if asset_table_name in table_list and transaction_table_name in table_list:
-            assets_df = load_snowflake_to_pandas(asset_table_name)
-            transactions_df = load_snowflake_to_pandas(transaction_table_name)
+            assets_df = utils.load_snowflake_to_pandas(asset_table_name,conn)
+            transactions_df = utils.load_snowflake_to_pandas(transaction_table_name,conn)
             #st.write(transactions_df)
             display_all_funds(transactions_df,assets_df)
         elif asset_table_name in table_list:

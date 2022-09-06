@@ -1,16 +1,43 @@
 import hashlib
+from sre_constants import SUCCESS
 
-import mysql.connector
+
 import streamlit as st
 
-import huabao_page
+from google.oauth2 import service_account
+from gspread_pandas import Spread,Client
+import pandas as pd
+from datetime import datetime
+
+
+#import huabao_page
 import overview_page
-import alipay_page
-import snowflake.connector
+#import alipay_page
+
 
 st.set_page_config(layout="wide")
 
 
+
+
+
+# Create a Google Authentication connection object
+scope = ['https://spreadsheets.google.com/feeds',
+         'https://www.googleapis.com/auth/drive']
+
+credentials = service_account.Credentials.from_service_account_info(
+                st.secrets["gcp_service_account"], scopes = scope)
+client = Client(scope=scope,creds=credentials)
+spreadsheetname = "data"
+spread = Spread(spreadsheetname,client = client)
+
+# Check the connection
+sh = client.open(spreadsheetname)
+worksheet_list = sh.worksheets()
+
+
+
+# Functions 
 def make_hashes(password):
     return hashlib.sha256(str.encode(password)).hexdigest()
 
@@ -20,44 +47,54 @@ def check_hashes(password, hashed_text):
         return hashed_text
     return False
 
+@st.cache()
+# Get our worksheet names
+def worksheet_names():
+    sheet_names = []   
+    for sheet in worksheet_list:
+        sheet_names.append(sheet.title)  
+    return sheet_names
 
-# Initialize connection.
-# Uses st.cache to only run once.
-#@st.cache(allow_output_mutation=True, hash_funcs={"_thread.RLock": lambda _: None})
-def init_connection():
-    return snowflake.connector.connect(**st.secrets["snowflake"])
+# get worksheet as a dataframe
+def load_worksheet(worksheetname):
+    worksheet = sh.worksheet(worksheetname)
+    df = pd.DataFrame(worksheet.get_all_records())
+    return df
 
-conn = init_connection()
+# update work sheet
+def update_worksheet(worksheetname,df):
+    col = df.columns
+    spread.df_to_sheet(df[col],sheet = worksheetname,index = False)
+    #st.sidebar.info('Updated to GoogleSheet')
 
+def add_new_user(username,password):
+    assert 'users' in worksheet_names()
+    now = datetime.now()
+    opt = {'username': [username],
+           'password' :  [password]} 
+    opt_df = pd.DataFrame(opt)
 
+    old_users_df = load_worksheet('users')
+    existing_users = old_users_df['username'].tolist()
+    if username in existing_users:
+        st.warning('User {} already exists. Try a different username.'.format(username))
+    else:
+        new_users_df = old_users_df.append(opt_df,ignore_index=True)
+        update_worksheet('users',new_users_df)
 
-# Perform query.
-# Uses st.cache to only rerun when the query changes or after 10 min.
-#@st.cache(ttl=600)
-def run_query(sql,val=None):
-    with conn.cursor() as cur:
-        if val:
-            cur.execute(sql,val)
-        else:
-            cur.execute(sql)
-        return cur.fetchall()
+def check_login(username,password):
+    assert 'users' in worksheet_names()
+    
+    users_df = load_worksheet('users')
+    user_pwd_pairs = users_df.values.tolist()
 
-def create_usertable():
-    run_query('CREATE TABLE IF NOT EXISTS userstable(username VARCHAR(255) PRIMARY KEY,password VARCHAR(255))')
+    is_login_ok = False
+    for name,pwd in user_pwd_pairs:
+        if name == username:
+            is_login_ok = (pwd == password)
+    
+    return is_login_ok
 
-
-def add_userdata(username, password):
-    # ADD: check if username already exists
-    run_query('INSERT INTO userstable(username,password) VALUES (%s,%s)', (username, password))
-    conn.commit()
-
-
-def login_user(username, password):
-    return run_query('SELECT * FROM userstable WHERE username =%s AND password = %s',(username, password))
-
-
-def view_all_users():
-    return run_query('SELECT * FROM userstable')
 
 def signout():
     # Delete all the items in Session state
@@ -82,12 +119,10 @@ def main():
             username = st.sidebar.text_input("Username")
             password = st.sidebar.text_input("Password", type='password')
             if st.sidebar.button("Log In"):
-                create_usertable()
-                hashed_pswd = make_hashes(password)
+                hashed_pwd = make_hashes(password)
 
-                result = login_user(
-                    username, check_hashes(password, hashed_pswd))
-                if result:
+                is_login_ok = check_login(username, check_hashes(password, hashed_pwd))
+                if is_login_ok:
                     st.success("Logged In as {}".format(username))
                     st.session_state['login'] = 1
                     st.session_state['user'] = username
@@ -100,18 +135,12 @@ def main():
             new_password = st.sidebar.text_input("Password", type='password')
 
             if st.sidebar.button("Sign Up"):
-                create_usertable()
-                if new_user in [r[0] for r in view_all_users()]:
-                    st.warning('Username {} already exists. Try a different username.'.format(new_user))
-                else:
-                    add_userdata(new_user, make_hashes(new_password))
-                    st.success("You have successfully created a valid account")
-                    st.info("Go to Login Menu to login")
+                add_new_user(new_user, make_hashes(new_password))
+                st.success("You have successfully created a valid account")
+                st.info("Go to Login Menu to login")
     else:
         PAGES = {
             "总览": overview_page
-            ,"华宝": huabao_page
-            ,"支付宝": alipay_page
         }
 
         # user interaction
@@ -126,6 +155,13 @@ def main():
 
 
 
-
 if __name__ == '__main__':
     main()
+
+
+
+
+
+
+
+

@@ -1,8 +1,60 @@
 import scipy.optimize
 import requests
-import execjs
+#import execjs
 import difflib
 import json
+import hashlib
+import streamlit as st
+from google.oauth2 import service_account
+from gspread_pandas import Spread,Client
+import pandas as pd
+
+
+
+
+def setup_connection():
+    # Create a Google Authentication connection object
+    scope = ['https://spreadsheets.google.com/feeds',
+             'https://www.googleapis.com/auth/drive']
+    
+    credentials = service_account.Credentials.from_service_account_info(
+                    st.secrets["gcp_service_account"], scopes = scope)
+    client = Client(scope=scope,creds=credentials)
+    spreadsheetname = "data"
+    spread = Spread(spreadsheetname,client = client)
+    
+    # Check the connection
+    sh = client.open(spreadsheetname)
+    worksheet_names = []   
+    for sheet in sh.worksheets():
+        worksheet_names.append(sheet.title)
+    
+    return sh, spread, worksheet_names
+
+
+def make_hashes(password):
+    return hashlib.sha256(str.encode(password)).hexdigest()
+
+
+def check_hashes(password, hashed_text):
+    if make_hashes(password) == hashed_text:
+        return hashed_text
+    return False
+
+
+# get worksheet as a dataframe
+def load_worksheet(worksheetname,sh):
+    worksheet = sh.worksheet(worksheetname)
+    df = pd.DataFrame(worksheet.get_all_records())
+    return df
+
+
+# update work sheet
+def update_worksheet(worksheetname,df,spread):
+    col = df.columns
+    spread.df_to_sheet(df[col],sheet = worksheetname,index = False)
+    #st.sidebar.info('Updated to GoogleSheet')
+
 
 
 def get_table_list(conn):

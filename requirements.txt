@@ -7,3 +7,4 @@ akshare==1.7.17
 pyxirr==0.6.3
 gspread-pandas==3.2.2
 google-auth==2.11.0
+streamlit-aggrid==0.3.3

@@ -2,6 +2,7 @@ import scipy.optimize
 import requests
 #import execjs
 import difflib
+import akshare as ak
 import json
 import hashlib
 import streamlit as st
@@ -55,6 +56,21 @@ def update_worksheet(worksheetname,df,spread):
     spread.df_to_sheet(df[col],sheet = worksheetname,index = False)
     #st.sidebar.info('Updated to GoogleSheet')
 
+
+def get_closest_price(code,date):
+    date = date.strftime('%Y-%m-%d')
+    stock_us_hist_df = ak.stock_us_hist(symbol=code, start_date="19700101", end_date="22220101", adjust="qfq")
+    closest_day = '1930-10-14'
+    date_list = sorted(stock_us_hist_df['日期'].tolist())
+    assert date >= date_list[0]
+    for d in date_list:
+        if d < date:
+            closest_day = d
+        elif d == date:
+            return stock_us_hist_df[stock_us_hist_df['日期']==d]['收盘'].values.item()
+        else:
+            return stock_us_hist_df[stock_us_hist_df['日期']==closest_day]['收盘'].values.item()
+    return stock_us_hist_df[stock_us_hist_df['日期']==closest_day]['收盘'].values.item()
 
 
 def get_table_list(conn):

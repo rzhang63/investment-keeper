@@ -73,6 +73,21 @@ def get_closest_price(code,date):
     return stock_us_hist_df[stock_us_hist_df['日期']==closest_day]['收盘'].values.item()
 
 
+def get_crypto_price(symbol, date):
+    date_str = date.strftime('%Y-%m-%d')
+    api_key = 'YOUR API KEY'
+    exchange = 'USD'
+    days = 365*3
+    api_url = f'https://min-api.cryptocompare.com/data/v2/histoday?fsym={symbol}&tsym={exchange}&limit={days}&api_key={api_key}'
+    raw = requests.get(api_url).json()
+    df = pd.DataFrame(raw['Data']['Data'])[['time', 'high', 'low', 'open', 'close']]#.set_index('time')
+    df['time'] = pd.to_datetime(df['time'], unit = 's')
+    
+    assert date in df['time'].tolist()
+    return df[df['time']==date_str]['close'].values.item()
+
+
+
 def get_table_list(conn):
     with conn.cursor() as cur:
         table_list = [entry[1] for entry in cur.execute('show tables').fetchall()]

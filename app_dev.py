@@ -1,8 +1,10 @@
 
 import akshare as ak
 from datetime import datetime
+import requests
+import pandas as pd
 
-datetime_str = '2023-04-16'
+datetime_str = '2022-09-11'
 
 datetime_object = datetime.strptime(datetime_str, '%Y-%m-%d')
 
@@ -29,5 +31,21 @@ def get_closest_price(code,date):
 
 out = get_closest_price('107.CHAU',datetime_object)
 
+
+def get_crypto_price(symbol, date):
+    date_str = date.strftime('%Y-%m-%d')
+    api_key = 'YOUR API KEY'
+    exchange = 'USD'
+    days = 365*3
+    api_url = f'https://min-api.cryptocompare.com/data/v2/histoday?fsym={symbol}&tsym={exchange}&limit={days}&api_key={api_key}'
+    raw = requests.get(api_url).json()
+    df = pd.DataFrame(raw['Data']['Data'])[['time', 'high', 'low', 'open', 'close']]#.set_index('time')
+    df['time'] = pd.to_datetime(df['time'], unit = 's')
+    
+    assert date in df['time'].tolist()
+    return df[df['time']==date_str]['close'].values.item()
+    #return df.sort_values(by=['time'],ascending=True)
+
+out = get_crypto_price('DOGE',datetime_object)
 
 print(out)

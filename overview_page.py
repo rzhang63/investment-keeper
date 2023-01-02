@@ -186,40 +186,6 @@ def main():
     cols[2].metric("XIRR", "{:.2f}%".format(xirr*100.0))
 
     
-    st.subheader('BTC')
-    code = 'BTC'
-    selected_df = df[(df['code']==code) & (df['date']>=start_date_str) & (df['date']<=end_date_str)]
-    end_date_price = utils.get_crypto_price(code,end_date)
-    metrics = compute_metrics(selected_df,end_date_str,end_date_price)
-
-    cols = st.columns((1, 1, 1))
-    cols[0].metric("总买入金额 (股数, 买入成本)", "${:.2f} ({:.2f}, ${:.2f})".format(metrics['total_buy_amount'], metrics['total_buy_quantity'], metrics['buy_avg_cost']))
-    cols[1].metric("总卖出金额 (股数, 卖出均价)", "${:.2f} ({:.2f}, ${:.2f})".format(metrics['total_sell_amount'], metrics['total_sell_quantity'], metrics['sell_avg_price']))
-    cols[2].metric("{}持有市值（股数，收盘价）".format(end_date_str), "${:.2f} ({:.2f}, ${:.2f})".format(end_date_price*metrics['hold_quantity'], metrics['hold_quantity'], end_date_price))
-    
-    cols = st.columns((1, 1, 1))
-    cols[0].metric("持有成本(收益)", "${:.2f} (${:.2f}, {:.2f}%)".format(metrics['hold_avg_cost1'], metrics['hold_return_amount1'], 100.0*metrics['hold_return_pct1']))
-    cols[1].metric("累计成本(收益)", "${:.2f} (${:.2f}, {:.2f}%)".format(metrics['hold_avg_cost2'], metrics['hold_return_amount2'], 100.0*metrics['hold_return_pct2']))
-    cols[2].metric("XIRR", "{:.2f}%".format(metrics['xirr']*100.0))
-
-
-    st.subheader('DOGE')
-    code = 'DOGE'
-    selected_df = df[(df['code']==code) & (df['date']>=start_date_str) & (df['date']<=end_date_str)]
-    end_date_price = utils.get_crypto_price(code,end_date)
-    metrics = compute_metrics(selected_df,end_date_str,end_date_price)
-
-    cols = st.columns((1, 1, 1))
-    cols[0].metric("总买入金额 (股数, 买入成本)", "${:.2f} ({:.2f}, ${:.2f})".format(metrics['total_buy_amount'], metrics['total_buy_quantity'], metrics['buy_avg_cost']))
-    cols[1].metric("总卖出金额 (股数, 卖出均价)", "${:.2f} ({:.2f}, ${:.2f})".format(metrics['total_sell_amount'], metrics['total_sell_quantity'], metrics['sell_avg_price']))
-    cols[2].metric("{}持有市值（股数，收盘价）".format(end_date_str), "${:.2f} ({:.2f}, ${:.2f})".format(end_date_price*metrics['hold_quantity'], metrics['hold_quantity'], end_date_price))
-    
-    cols = st.columns((1, 1, 1))
-    cols[0].metric("持有成本(收益)", "${:.2f} (${:.2f}, {:.2f}%)".format(metrics['hold_avg_cost1'], metrics['hold_return_amount1'], 100.0*metrics['hold_return_pct1']))
-    cols[1].metric("累计成本(收益)", "${:.2f} (${:.2f}, {:.2f}%)".format(metrics['hold_avg_cost2'], metrics['hold_return_amount2'], 100.0*metrics['hold_return_pct2']))
-    cols[2].metric("XIRR", "{:.2f}%".format(metrics['xirr']*100.0))
-
-    st.write(metrics['hold_avg_cost1'])
 
 
 if __name__ == '__main__':

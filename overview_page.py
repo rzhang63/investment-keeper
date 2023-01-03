@@ -142,7 +142,7 @@ def main():
 
     total_value_df = utils.load_worksheet('totalValue',sh).sort_values(by=['date'],ascending=False)#.astype({'date': 'datetime'})
     total_value_df = total_value_df.where(total_value_df["user"]==st.session_state['user'])
-    st.write(total_value_df[['date','amount']])
+    st.write(total_value_df[['date','amount']].iloc[0,])
 
     #valuesPerDate_list = selected_df[['date','amount']].values.tolist() + total_value_df.iloc[0,0][['date','amount']].values.tolist()
     #valuesPerDate_list = [(datetime.strptime(x[0], '%Y-%m-%d'),x[1]) for x in valuesPerDate_list]

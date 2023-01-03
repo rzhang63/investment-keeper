@@ -147,8 +147,11 @@ def main():
     valuesPerDate_list = selected_df[['date','amount']].values.tolist() + [total_value_df[['date','amount']].values.tolist()[0]]
     valuesPerDate_list = [(datetime.strptime(x[0], '%Y-%m-%d'),x[1]) for x in valuesPerDate_list]
     xirr = utils.xirr(valuesPerDate_list)
-    st.write(xirr)
-    st.write(valuesPerDate_list)
+    #st.write(xirr)
+    #st.write(valuesPerDate_list)
+
+    cols = st.columns((1, 1, 1))
+    cols[0].metric("XIRR", "{:.2f}%".format(xirr*100.0))
 
 
     st.subheader("CHAU")

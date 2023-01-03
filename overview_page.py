@@ -140,9 +140,9 @@ def main():
     selected_df = df[(df['code']==code) & (df['date']>=start_date_str) & (df['date']<=end_date_str)]
     st.write(selected_df)
 
-    total_value_df = utils.load_worksheet('totalValue',sh).sort_values(by=['date'])#.astype({'date': 'datetime'})
+    total_value_df = utils.load_worksheet('totalValue',sh).sort_values(by=['date'],ascending=False)#.astype({'date': 'datetime'})
     total_value_df = total_value_df.where(total_value_df["user"]==st.session_state['user'])
-    st.write(total_value_df)
+    st.write(total_value_df['amount'])
 
 
     st.subheader("CHAU")

@@ -144,6 +144,10 @@ def main():
     total_value_df = total_value_df.where(total_value_df["user"]==st.session_state['user'])
     st.write(total_value_df['amount'].item())
 
+    #valuesPerDate_list = total_value_df[['date','amount']].values.tolist() + [(end_date_str,end_date_price*hold_quantity)]
+    #valuesPerDate_list = [(datetime.strptime(x[0], '%Y-%m-%d'),x[1]) for x in valuesPerDate_list]
+    #xirr = utils.xirr(valuesPerDate_list)
+
 
     st.subheader("CHAU")
     

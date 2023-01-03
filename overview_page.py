@@ -136,6 +136,9 @@ def main():
 
     st.subheader("Overall")
 
+    code = 'ACH'
+    selected_df = df[(df['code']==code) & (df['date']>=start_date_str) & (df['date']<=end_date_str)]
+    st.write(selected_df)
 
 
     st.subheader("CHAU")

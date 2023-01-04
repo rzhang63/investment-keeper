@@ -165,6 +165,8 @@ def main():
     selected_df = df[(df['code']==code) & (df['date']>=start_date_str) & (df['date']<=end_date_str)]
     end_date_price = utils.get_closest_price('107.CHAU',end_date)
 
+    st.write(type(selected_df['date'][0]))
+
 
 
     hs300_daily_tx_df = ak.stock_zh_index_daily_tx(symbol="sh000300")[['date','close']]
@@ -172,7 +174,7 @@ def main():
     df1 = df[df['date']>=datetime.strptime('2022-12-15', '%Y-%m-%d').date()]
     df2 = df[df['date']<datetime.strptime('2022-12-15', '%Y-%m-%d').date()]
     
-    
+
     fig, ax = plt.subplots(figsize=(20, 10))
     ax.scatter(df1['date'],df1[['close']],marker='.',s=500,linewidth = 0)
     ax.scatter(df2['date'],df2[['close']],marker='.',s=500,linewidth = 0)

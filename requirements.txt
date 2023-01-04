@@ -8,3 +8,4 @@ pyxirr==0.6.3
 gspread-pandas==3.2.2
 google-auth==2.11.0
 streamlit-aggrid==0.3.3
+matplotlib==3.6.2

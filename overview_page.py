@@ -1,6 +1,9 @@
 import streamlit as st 
 import utils
 import pandas as pd
+import akshare as ak
+import numpy as np
+import matplotlib.pyplot as plt
 from st_aggrid import AgGrid, GridOptionsBuilder
 from st_aggrid.shared import GridUpdateMode
 from datetime import date, datetime
@@ -152,6 +155,13 @@ def main():
 
     cols = st.columns((1, 1, 1))
     cols[0].metric("XIRR", "{:.2f}%".format(xirr*100.0))
+
+
+    x = np.linspace(0, 2 * np.pi, 200)
+    y = np.sin(x)
+
+    fig, ax = plt.subplots()
+    ax.plot(x, y)
 
 
     st.subheader("CHAU")

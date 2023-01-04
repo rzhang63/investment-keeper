@@ -163,6 +163,8 @@ def main():
     fig, ax = plt.subplots()
     ax.plot(x, y)
 
+    st.pyplot(fig)
+
 
     st.subheader("CHAU")
     

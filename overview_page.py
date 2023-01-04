@@ -157,13 +157,6 @@ def main():
     cols[0].metric("XIRR", "{:.2f}%".format(xirr*100.0))
 
 
-    x = np.linspace(0, 2 * np.pi, 200)
-    y = np.sin(x)
-
-    fig, ax = plt.subplots()
-    ax.plot(x, y)
-
-    st.pyplot(fig)
 
 
     st.subheader("CHAU")
@@ -171,6 +164,23 @@ def main():
     code = 'CHAU'
     selected_df = df[(df['code']==code) & (df['date']>=start_date_str) & (df['date']<=end_date_str)]
     end_date_price = utils.get_closest_price('107.CHAU',end_date)
+
+
+
+    hs300_daily_tx_df = ak.stock_zh_index_daily_tx(symbol="sh000300")[['date','close']]
+    df = hs300_daily_tx_df[hs300_daily_tx_df['date']>=datetime.strptime('2022-12-01', '%Y-%m-%d').date()]
+    df1 = df[df['date']>=datetime.strptime('2022-12-15', '%Y-%m-%d').date()]
+    df2 = df[df['date']<datetime.strptime('2022-12-15', '%Y-%m-%d').date()]
+    
+    
+    fig, ax = plt.subplots(figsize=(20, 10))
+    ax.scatter(df1['date'],df1[['close']],marker='.',s=500,linewidth = 0)
+    ax.scatter(df2['date'],df2[['close']],marker='.',s=500,linewidth = 0)
+    ax.plot(df['date'],df[['close']],linewidth=0.1,c='k')
+
+    st.pyplot(fig)
+
+
     #st.write(selected_df[['date','amount']].values.tolist())
     
     # Total

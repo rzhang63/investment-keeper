@@ -165,7 +165,7 @@ def main():
     selected_df = df[(df['code']==code) & (df['date']>=start_date_str) & (df['date']<=end_date_str)]
     end_date_price = utils.get_closest_price('107.CHAU',end_date)
 
-    st.write(type(selected_df['date'][0]))
+    st.write(selected_df['date'][0])
 
 
 
